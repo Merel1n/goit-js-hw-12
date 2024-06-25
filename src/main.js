@@ -14,6 +14,7 @@ let value = '';
 export let currentPage = 1;
 export let maxPage = 1;
 const perPages = 15;
+let lightbox;
 // ===============================================================================
 refs.formElem.addEventListener('submit', async e => {
   e.preventDefault();
@@ -38,11 +39,11 @@ refs.formElem.addEventListener('submit', async e => {
     }
     const markup = await galleryTemplate(data.hits);
     refs.listElems.innerHTML = markup;
-    new simpleLightbox('.gallery a', {
+    lightbox = new simpleLightbox('.gallery a', {
       captions: true,
       captionsData: 'alt',
       captionDelay: 250,
-    }).refresh();
+    });
   } catch (error) {
     showError(
       'Sorry, there are no images matching your search query. Please try again!'
@@ -60,11 +61,15 @@ refs.btnElement.addEventListener('click', async e => {
     const data = await getImage(value, currentPage);
     const markup = await galleryTemplate(data.hits);
     refs.listElems.insertAdjacentHTML('beforeend', markup);
-    new simpleLightbox('.gallery a', {
-      captions: true,
-      captionsData: 'alt',
-      captionDelay: 250,
-    }).refresh();
+    if (!lightbox) {
+      lightbox = new simpleLightbox('.gallery a', {
+        captions: true,
+        captionsData: 'alt',
+        captionDelay: 250,
+      });
+    } else {
+      lightbox.refresh();
+    }
     skipOldElement();
   } catch (error) {
     showError(
